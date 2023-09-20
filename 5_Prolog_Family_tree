@@ -120,6 +120,20 @@ niece(X,Y):-female(X),parent(A,X),sibling(A,Y).
     
 nephew(X,Y):-male(X),parent(A,X),sibling(A,Y).
 
-
+/** <examples>
+?- grandson(sumit,laxmi)
+?- daughter_in_law(leena,janaklal)
+?- granddaughter(sakshee,janaklal)
+?- nephew(sumit,leena)
+?- niece(sakshee,taruna)
+?- sister(sakshee,palak)
+?- maternal_grandmother(laxmi,sakshee)
+?- maternal_grandmother(laxmi,sumit)
+?- brother(sandeep,seema)
+?- maternal_aunt(taruna,sakshee)
+?- paternal_aunt(seema,sakshee)
+?- son_in_law(omprakash,suresh)
+?- son_in_law(sandeep,suresh)
+*/
 
 
