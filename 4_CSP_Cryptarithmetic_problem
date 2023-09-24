@@ -1,108 +1,87 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <unordered_map>
+#include <algorithm>
 using namespace std;
 
-vector<int> use(10);
-vector<int> no = {1, 2, 3, 4, 5, 6, 7, 8, 9, 0};
-
-struct node {
-    char c;
-    int v;
-};
-
-vector<node> nodeArr;
+unordered_map<char, int> charToValue;
 
 int calculateString(const string& s) {
     int val = 0;
 
     for (char ch : s) {
-        for (const node& n : nodeArr) {
-            if (n.c == ch) {
-                val = val * 10 + n.v;
-                break;
-            }
-        }
+        val = val * 10 + charToValue[ch];
     }
 
     return val;
 }
 
-int check(string s1, string s2, string s3) {
-    int val1 = calculateString(s1);
-    int val2 = calculateString(s2);
-    int val3 = calculateString(s3);
-
-    return (val3 == (val1 + val2));
-}
-
-bool permutation(int count, int n, string s1, string s2, string s3) {
-    if (n == count) {
-        if (check(s1, s2, s3)) {
-            cout << "\nSolution found:"<<endl;
-            for (int j = 0; j < count; j++)
-                cout << " " << nodeArr[j].c << " = " << nodeArr[j].v<<endl;
-            return true;
-        }
-        return false;
+bool solveCryptarithmetic(string s1, string s2, string s3, string chars, vector<bool>& used) {
+    if (chars.empty()) {
+        int val1 = calculateString(s1);
+        int val2 = calculateString(s2);
+        int val3 = calculateString(s3);
+        return (val1 + val2 == val3);
     }
 
     for (int i = 0; i < 10; i++) {
-        if (use[i] == 0) {
-            nodeArr[n].v = no[i];
-            use[i] = 1;
-            if (permutation(count, n + 1, s1, s2, s3))
+        char ch = chars.back();
+        if (i == 0 && (ch == s1[0] || ch == s2[0] || ch == s3[0]))
+            continue;
+        if (!used[i]) {
+            charToValue[ch] = i;
+            used[i] = true;
+            chars.pop_back();
+            if (solveCryptarithmetic(s1, s2, s3, chars, used))
                 return true;
-            use[i] = 0;
+            chars.push_back(ch);
+            used[i] = false;
         }
     }
+
     return false;
 }
 
 bool solveCryptarithmetic(string s1, string s2, string s3) {
-    int count = 0;
-    vector<int> freq(26);
+    string chars = s1 + s2 + s3;
+    sort(chars.begin(), chars.end());
+    chars.erase(unique(chars.begin(), chars.end()), chars.end());
 
-    for (char ch : s1)
-        if (isalpha(ch))
-            ++freq[ch - 'A'];
-    for (char ch : s2)
-        if (isalpha(ch))
-            ++freq[ch - 'A'];
-    for (char ch : s3)
-        if (isalpha(ch))
-            ++freq[ch - 'A'];
-
-    for (int i = 0; i < 26; i++)
-        if (freq[i] > 0)
-            count++;
-
-    if (count > 10) {
-        cout << "Invalid strings (count of unique characters > 10)";
+    if (chars.length() > 10) {
         return false;
     }
 
-    nodeArr.resize(count);  
-    int idx = 0;
-    for (int i = 0; i < 26; i++) {
-        if (freq[i] > 0) {
-            nodeArr[idx].c = char(i + 'A');
-            idx++;
-        }
-    }
-
-    return permutation(count, 0, s1, s2, s3);
+    vector<bool> used(10, false); // Initialize used vector
+    return solveCryptarithmetic(s1, s2, s3, chars, used);
 }
 
 int main() {
-    string s1 = "SEND";
-    string s2 = "MORE";
-    string s3 = "MONEY";
+//    string s1 = "YOUR";
+//    string s2 = "YOU";
+//    string s3 = "HEART";
 
-    if (solveCryptarithmetic(s1, s2, s3) == false)
-        cout << "\nNo solution";
- 
+//    string s1 = "USSR";
+//    string s2 = "USA";
+//    string s3 = "PEACE";
     
+//    string s1 = "MAC";
+//    string s2 = "MAAR";
+//    string s3 = "JOCKO";
+    
+//    string s1 = "EVER";
+//    string s2 = "SINCE";
+//    string s3 = "DARWIN";
+    
+
+    if (solveCryptarithmetic(s1, s2, s3)) {
+        cout << "Solution found:" << endl;
+        for (const auto& pair : charToValue) {
+            cout << " " << pair.first << " = " << pair.second << endl;
+        }
+    } else {
+        cout << "No solution" << endl;
+    }
+
     return 0;
 }
-
